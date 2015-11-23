@@ -130,6 +130,21 @@ bool StaticGraph::InferNodeShapes(const std::vector<uint32_t> &topo_order,
           throw dmlc::Error(os.str());
         }
       }
+
+      // set for auxilary states shape.
+      auto& source_aux_shapes = (*node_aux_shapes)[node.backward_source_id];
+      for (size_t i = 0; i < source_aux_shapes.size(); ++i) {
+        try {
+          (*node_aux_shapes)[nid].push_back(source_aux_shapes[i]);
+        } catch (const op::InferShapeError &err) {
+          const std::string &op_name = nodes[nid].name;
+          std::ostringstream os;
+          os << "InferShape Error in "
+             << op_name << "\'s" << " aux states\n"
+             << err.msg;
+          throw dmlc::Error(os.str());
+        }
+      }
     }
   }
   // TODO(bing) assign shape for head gradient
@@ -308,10 +323,12 @@ void StaticGraph::Node::Save(dmlc::JSONWriter *writer) const {
   writer->WriteObjectKeyValue("name", name);
   writer->WriteObjectKeyValue("inputs", inputs);
   writer->WriteObjectKeyValue("backward_source_id", backward_source_id);
+  if (attr.size() != 0) writer->WriteObjectKeyValue("attr", attr);
   writer->EndObject();
 }
 
 void StaticGraph::Node::Load(dmlc::JSONReader *reader) {
+  attr.clear();
   dmlc::JSONObjectReadHelper helper;
   std::string op_type_str;
   std::map<std::string, std::string> param;
@@ -320,6 +337,7 @@ void StaticGraph::Node::Load(dmlc::JSONReader *reader) {
   helper.DeclareField("name", &name);
   helper.DeclareField("inputs", &inputs);
   helper.DeclareField("backward_source_id", &backward_source_id);
+  helper.DeclareOptionalField("attr", &attr);
   helper.ReadAllFields(reader);
 
   if (op_type_str != "null") {
