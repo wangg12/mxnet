@@ -66,7 +66,7 @@ We should note that this result is by no means optimal, as we did not carefully 
 
 
 ## The Code and Model
-The code and step guide is publically available at [https://github.com/dmlc/mxnet/tree/master/example/imagenet](https://github.com/dmlc/mxnet/tree/master/example/imagenet)
+The code and step guide is publically available at [https://github.com/dmlc/mxnet/tree/master/example/image-classification](https://github.com/dmlc/mxnet/tree/master/example/image-classification)
 
 We also release a pretrained model under [https://github.com/dmlc/mxnet-model-gallery/tree/master/imagenet-21k-inception](https://github.com/dmlc/mxnet-model-gallery/tree/master/imagenet-21k-inception)
 
